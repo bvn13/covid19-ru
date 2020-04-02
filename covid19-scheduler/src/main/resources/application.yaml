@@ -1,0 +1,49 @@
+app:
+  user-agent: Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:74.0) Gecko/20100101 Firefox/74.0
+  zone-id: Europe/Moscow
+  timer:
+    # IN SECONDS
+    # 1 hour
+    stopcoronovirusrf: 3600
+
+spring:
+  application:
+    name: covid19-scheduler
+
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/covid19
+    username: <covid19>
+    password: <covid19pass>
+
+  jpa:
+    show-sql: true
+    hibernate:
+      dialect: org.hibernate.dialect.PostgreSQL
+      ddl-auto: update
+
+    properties:
+      hibernate:
+        use_sql_comments: true
+        format_sql: true
+        show_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+logging:
+  level:
+    root: info
+    com:
+      bvn13:
+        covid19: debug
+    org:
+      springframework: warn
+      hibernate:
+        SQL: debug
+        type:
+          descriptor:
+            sql:
+              BasicBinder: trace
+  pattern:
+    console: "%d{dd-MM-yyyy HH:mm:ss.SSS} %highlight(%-5level) %magenta([%thread]) %yellow(%logger.%M) - %msg%n"

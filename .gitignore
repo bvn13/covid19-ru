@@ -1,0 +1,6 @@
+.ideaDataSources
+dataSources
+
+*.iml
+*.ipr
+*.iws
