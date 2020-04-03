@@ -4,3 +4,5 @@ dataSources
 *.iml
 *.ipr
 *.iws
+
+.gradle/
