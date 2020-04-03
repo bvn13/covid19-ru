@@ -13,3 +13,6 @@ dependencies {
 
 }
 
+bootJar {
+    mainClassName 'com.bvn13.covid19.api.Covid19ApiApplication'
+}
