@@ -13,6 +13,6 @@ dependencies {
 
 }
 
-bootJar {
+springBoot {
     mainClassName 'com.bvn13.covid19.api.Covid19ApiApplication'
 }

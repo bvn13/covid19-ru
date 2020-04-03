@@ -1,48 +1,35 @@
-buildscript {
-    ext {
-        springBootVersion = '2.2.6.RELEASE'
-        springBootDependenciesVersion = '1.0.9.RELEASE'
-    }
-
-    repositories {
-        maven { url 'https://repo.spring.io/milestone' }
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
-        classpath "io.spring.gradle:dependency-management-plugin:${springBootDependenciesVersion}"
-    }
-}
-
-
 plugins {
     id 'org.springframework.boot' version '2.2.6.RELEASE'
-    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
     id 'java'
 }
 
-allprojects {
-    repositories {
-        mavenCentral()
-    }
-}
+//allprojects {
+//    repositories {
+//        mavenCentral()
+//        jcenter()
+//        maven { url "https://plugins.gradle.org/m2/" }
+//        maven { url 'https://repo.spring.io/milestone' }
+//    }
+//}
 
 subprojects {
     project.ext {
         camelVersion = '3.1.0'
-        springBootDependenciesVersion = '2.2.2.RELEASE'
+        springBootVersion = '2.2.6.RELEASE'
+        springBootDependenciesVersion = '2.2.6.RELEASE'
         fasterxmlJacksonVersion = '2.10.0'
         apacheCommonsCollectionsVersion = '4.4'
         apacheCommonsLangVersion = '3.9'
     }
 
+    group = 'com.bvn13.covid19'
+    version = '0.0.1'
+
     apply plugin: 'java'
     apply plugin: 'idea'
-    apply plugin: 'org.springframework.boot'
+//    apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
-
-    group = 'com.bvn13.covid19'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -52,14 +39,14 @@ subprojects {
         mavenCentral()
     }
 
-    tasks.withType(JavaCompile) {
-        options.encoding = 'UTF-8'
-    }
-
     dependencyManagement {
         imports {
             mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
         }
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
     }
 
     configurations {
@@ -96,3 +83,5 @@ subprojects {
 
 defaultTasks('clean', 'compileTestJava', 'jar')
 
+bootJar { enabled = false }
+jar { enabled = false }
