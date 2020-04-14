@@ -67,7 +67,7 @@ public class StopcoronovirusRfDataRetriever {
                     .build());
         }
 
-        exchange.getIn().setHeader(StopcoronovirusRfUpdater.HEADER_DATE_OF_DATA, doc.selectFirst(".d-map__title > span").ownText());
+        exchange.getIn().setHeader(StopcoronovirusRfUpdater.HEADER_DATE_OF_DATA, doc.selectFirst(".d-map__title span").ownText());
         exchange.getIn().setBody(rows);
 
     }

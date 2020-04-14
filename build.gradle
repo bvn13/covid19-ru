@@ -1,17 +1,26 @@
-plugins {
-    id 'org.springframework.boot' version '2.2.6.RELEASE'
-    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
-    id 'java'
+buildscript {
+    ext {
+        springBootVersion = '2.2.6.RELEASE'
+        springBootDependenciesVersion = '1.0.8.RELEASE'
+    }
+
+    repositories {
+        maven { url 'https://repo.spring.io/milestone' }
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+        classpath "io.spring.gradle:dependency-management-plugin:${springBootDependenciesVersion}"
+    }
 }
 
-//allprojects {
-//    repositories {
-//        mavenCentral()
-//        jcenter()
-//        maven { url "https://plugins.gradle.org/m2/" }
-//        maven { url 'https://repo.spring.io/milestone' }
-//    }
-//}
+allprojects {
+    repositories {
+        maven { url 'https://repo.spring.io/milestone' }
+        mavenCentral()
+    }
+}
 
 subprojects {
     project.ext {
@@ -82,6 +91,3 @@ subprojects {
 }
 
 defaultTasks('clean', 'compileTestJava', 'jar')
-
-bootJar { enabled = false }
-jar { enabled = false }
