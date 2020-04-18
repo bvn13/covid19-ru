@@ -23,11 +23,12 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "covid_statistics")
+@Table(schema = "covid", name = "cvd_stats")
 public class CovidStat {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "cvd_stats_seq")
+    @SequenceGenerator(schema = "covid", name = "cvd_stats_seq", sequenceName = "cvd_stats_seq", allocationSize = 1)
     private long id;
 
     private LocalDateTime createdOn;
@@ -37,8 +38,8 @@ public class CovidStat {
     private Region region;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "update_info_id")
-    private CovidUpdateInfo updateInfo;
+    @JoinColumn(name = "update_id")
+    private CovidUpdate updateInfo;
 
     private long sick;
     private long healed;

@@ -19,7 +19,10 @@ package com.bvn13.covid19.scheduler.updater.stopcoronovirusrf;
 import com.bvn13.covid19.scheduler.updater.stopcoronovirusrf.model.RowData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.camel.*;
+import org.apache.camel.Body;
+import org.apache.camel.Handler;
+import org.apache.camel.Header;
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -36,11 +39,11 @@ public class StopcoronovirusRfUpdater extends RouteBuilder {
 
     private final StopcoronovirusRfDataRetriever dataRetriever;
     private final StopcoronovirusRfService service;
+    private final MailConfig mailConfig;
 
     @Value("${app.timer.stopcoronovirusrf}")
     private int stopcoronovirusrfTimerSecons;
     private long stopcoronovirusrfTimerMillis;
-
 
     @PostConstruct
     public void init() {
@@ -49,6 +52,9 @@ public class StopcoronovirusRfUpdater extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
+
+        onException(RuntimeException.class)
+                .to(mailConfig.constructEndpoint());
 
         from("timer:stopcoronovirusrf?delay=1000&period="+stopcoronovirusrfTimerMillis)
                 .log(LoggingLevel.DEBUG, log, "Start retrieving data from stopcoronovirus.rf")

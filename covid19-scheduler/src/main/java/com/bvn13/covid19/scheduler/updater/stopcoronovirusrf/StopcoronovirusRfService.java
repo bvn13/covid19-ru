@@ -17,11 +17,11 @@ limitations under the License.
 package com.bvn13.covid19.scheduler.updater.stopcoronovirusrf;
 
 import com.bvn13.covid19.model.entities.CovidStat;
+import com.bvn13.covid19.model.entities.CovidUpdate;
 import com.bvn13.covid19.model.entities.Region;
-import com.bvn13.covid19.model.entities.CovidUpdateInfo;
 import com.bvn13.covid19.scheduler.CovidStatsRepository;
-import com.bvn13.covid19.scheduler.RegionsRepository;
 import com.bvn13.covid19.scheduler.CovidUpdateInfosRepository;
+import com.bvn13.covid19.scheduler.RegionsRepository;
 import com.bvn13.covid19.scheduler.updater.stopcoronovirusrf.model.RowData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +33,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,31 +58,10 @@ public class StopcoronovirusRfService {
     @Transactional
     public void saveRawData(String date, Collection<RowData> rawData) {
 
-        ZonedDateTime zdt = parseZonedDateTime(date);
-
-        CovidUpdateInfo updateInfo = new CovidUpdateInfo();
-        updateInfo.setCreatedOn(LocalDateTime.now());
-        updateInfo.setDatetime(zdt);
-        updateInfo = updatesRepository.save(updateInfo);
-
-        Iterator<RowData> iter = rawData.iterator();
-        while (iter.hasNext())  {
-            RowData row = iter.next();
-
-            Region region = regionsRepository.findByName(row.getRegion()).orElseGet(() -> {
-                Region r = new Region();
-                r.setName(row.getRegion());
-                return regionsRepository.save(r);
-            });
-
-            CovidStat covidStat = new CovidStat();
-            covidStat.setUpdateInfo(updateInfo);
-            covidStat.setRegion(region);
-            covidStat.setSick(Long.parseLong(row.getSick()));
-            covidStat.setHealed(Long.parseLong(row.getHealed()));
-            covidStat.setDied(Long.parseLong(row.getDied()));
-
-            repository.save(covidStat);
+        ZonedDateTime dateOfData = parseZonedDateTime(date);
+        CovidUpdate updateInfo = createUpdateInfo(dateOfData);
+        for (RowData row : rawData) {
+            repository.save(createStats(row, updateInfo));
         }
 
     }
@@ -102,6 +80,31 @@ public class StopcoronovirusRfService {
         } else {
             throw new IllegalArgumentException("Could not parse date: "+date);
         }
+    }
+
+    private CovidUpdate createUpdateInfo(ZonedDateTime dateOfData) {
+        CovidUpdate updateInfo = new CovidUpdate();
+        updateInfo.setCreatedOn(LocalDateTime.now());
+        updateInfo.setDatetime(dateOfData);
+        return updatesRepository.save(updateInfo);
+    }
+
+    private Region detectRegion(String region) {
+        return regionsRepository.findByName(region).orElseGet(() -> {
+            Region r = new Region();
+            r.setName(region);
+            return regionsRepository.save(r);
+        });
+    }
+
+    private CovidStat createStats(RowData row, CovidUpdate updateInfo) {
+        CovidStat covidStat = new CovidStat();
+        covidStat.setUpdateInfo(updateInfo);
+        covidStat.setRegion(detectRegion(row.getRegion()));
+        covidStat.setSick(Long.parseLong(row.getSick()));
+        covidStat.setHealed(Long.parseLong(row.getHealed()));
+        covidStat.setDied(Long.parseLong(row.getDied()));
+        return covidStat;
     }
 
     private int detectMonth(String m) {

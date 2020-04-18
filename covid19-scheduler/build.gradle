@@ -6,10 +6,15 @@ dependencies {
     compile(project(':covid19-model'))
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.apache.camel.springboot:camel-spring-boot-starter:3.1.0'
+    implementation "org.apache.camel.springboot:camel-spring-boot-starter:${camelVersion}"
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-    implementation 'org.jsoup:jsoup:1.13.1'
+    compileOnly "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
+
+    implementation "org.jsoup:jsoup:${jsoupVersion}"
+    
+    implementation "org.apache.camel:camel-mail:${camelVersion}"
 
     runtimeOnly 'org.postgresql:postgresql'
 

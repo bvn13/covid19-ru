@@ -1,3 +1,6 @@
+server:
+  port: 8080
+
 app:
   zone-id: Europe/Moscow
 
@@ -11,6 +14,10 @@ spring:
       spec: expireAfterWrite=15m
     cache-names: covid-last-update-info, covid-stats-by-update-info-id
 
+  flyway:
+    locations: classpath:db/migration
+    schemas: covid
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/covid19
@@ -21,10 +28,11 @@ spring:
     show-sql: true
     hibernate:
       dialect: org.hibernate.dialect.PostgreSQL
-      ddl-auto: update
+      ddl-auto: validate
 
     properties:
       hibernate:
+        default_schema: covid
         use_sql_comments: true
         format_sql: true
         show_sql: true
@@ -47,3 +55,4 @@ logging:
               BasicBinder: trace
   pattern:
     console: "%d{dd-MM-yyyy HH:mm:ss.SSS} %highlight(%-5level) %magenta([%thread]) %yellow(%logger.%M) - %msg%n"
+

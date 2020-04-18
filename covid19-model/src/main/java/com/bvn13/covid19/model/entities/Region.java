@@ -18,19 +18,22 @@ package com.bvn13.covid19.model.entities;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Data
 @Entity
-@Table(name = "regions", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "name")
+@Table(schema = "covid", name = "regions", uniqueConstraints = {
+        @UniqueConstraint(name = "regions_name_uniq", columnNames = "name")
 })
 public class Region {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "cvd_regions_seq")
+    @SequenceGenerator(schema = "covid", name = "cvd_regions_seq", sequenceName = "cvd_regions_seq", allocationSize = 1)
+    private long id;
+
+    @NotBlank
     private String name;
 
 }

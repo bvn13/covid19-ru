@@ -1,1 +1,32 @@
 
+spring:
+  application:
+    name: covid19-model
+
+  flyway:
+    locations: classpath:db/migration
+    schemas: covid
+
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/covid19
+    username: postgres
+    password: <postgrespass>
+
+  jpa:
+    show-sql: true
+    hibernate:
+      dialect: org.hibernate.dialect.PostgreSQL
+      ddl-auto: none
+
+    properties:
+      hibernate:
+        default_schema: covid
+        use_sql_comments: true
+        format_sql: true
+        show_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+

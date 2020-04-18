@@ -34,8 +34,8 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/")
-public class MainController {
+@RequestMapping("/api")
+public class ApiController {
 
     private final CovidStatsMaker covidStatsMaker;
 

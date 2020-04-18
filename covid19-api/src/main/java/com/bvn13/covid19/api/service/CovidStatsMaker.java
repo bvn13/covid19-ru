@@ -19,7 +19,7 @@ package com.bvn13.covid19.api.service;
 import com.bvn13.covid19.api.repositories.CovidStatsRepository;
 import com.bvn13.covid19.api.repositories.CovidUpdateInfosRepository;
 import com.bvn13.covid19.model.entities.CovidStat;
-import com.bvn13.covid19.model.entities.CovidUpdateInfo;
+import com.bvn13.covid19.model.entities.CovidUpdate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
@@ -49,7 +49,7 @@ public class CovidStatsMaker {
             unless = "#result == null"
     )
     @Transactional
-    public Optional<CovidUpdateInfo> findLastUpdateInfo() {
+    public Optional<CovidUpdate> findLastUpdateInfo() {
         return updatesRepository.findLastUpdateInfo()
                 .flatMap(updateInfo -> updatesRepository.findFirstByCreatedOn(updateInfo.getCreatedOn()));
     }

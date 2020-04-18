@@ -24,13 +24,14 @@ import java.time.ZonedDateTime;
 
 @Data
 @Entity
-@Table(name = "update_info", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"createdOn"})
+@Table(schema = "covid", name = "cvd_updates", uniqueConstraints = {
+        @UniqueConstraint(name = "cvd_upd_created_uniq", columnNames = {"createdOn"})
 })
-public class CovidUpdateInfo {
+public class CovidUpdate {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "cvd_updates_seq")
+    @SequenceGenerator(schema = "covid", name = "cvd_updates_seq", sequenceName = "cvd_updates_seq", allocationSize = 1)
     private long id;
 
     private LocalDateTime createdOn;

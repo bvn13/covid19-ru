@@ -1,3 +1,6 @@
+server:
+  port: 8081
+
 app:
   user-agent: Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:74.0) Gecko/20100101 Firefox/74.0
   zone-id: Europe/Moscow
@@ -5,11 +8,21 @@ app:
     # IN SECONDS
     # 1 hour
     stopcoronovirusrf: 3600
+  mail:
+    username: <mail-username>
+    password: <mail-password>
+    host: smtp.yandex.ru
+    port: 465
+    to: <your-password>
+    subject: Ошибка загрузки данных COVID19
 
 spring:
   application:
     name: covid19-scheduler
 
+  flyway:
+    locations: classpath:db/migration
+    schemas: covid
 
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -21,10 +34,11 @@ spring:
     show-sql: true
     hibernate:
       dialect: org.hibernate.dialect.PostgreSQL
-      ddl-auto: update
+      ddl-auto: validate
 
     properties:
       hibernate:
+        default_schema: covid
         use_sql_comments: true
         format_sql: true
         show_sql: true

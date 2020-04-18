@@ -30,6 +30,8 @@ subprojects {
         fasterxmlJacksonVersion = '2.10.0'
         apacheCommonsCollectionsVersion = '4.4'
         apacheCommonsLangVersion = '3.9'
+        jsoupVersion = '1.13.1'
+        flywaydbVersion = '6.3.3'
     }
 
     group = 'com.bvn13.covid19'
