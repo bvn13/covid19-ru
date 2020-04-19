@@ -15,8 +15,7 @@ spring:
     cache-names: covid-last-update-info, covid-stats-by-update-info-id
 
   flyway:
-    locations: classpath:db/migration
-    schemas: covid
+    enabled: false
 
   datasource:
     driver-class-name: org.postgresql.Driver

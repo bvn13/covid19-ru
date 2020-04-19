@@ -1,6 +1,6 @@
 --create schema covid;
 
-create sequence covid.cvd_regions_seq start 1 increment by 1;
+create sequence covid.cvd_regions_seq start 1 increment by 1 no minvalue no maxvalue cache 1;
 
 create table covid.regions
 (
@@ -10,11 +10,11 @@ create table covid.regions
         constraint regions_name_uniq unique
 );
 
-alter sequence covid.cvd_regions_seq owned by covid.regions.id;
-alter sequence covid.cvd_regions_seq owner to covid19;
 alter table covid.regions owner to covid19;
+alter sequence covid.cvd_regions_seq owner to covid19;
+alter sequence covid.cvd_regions_seq owned by covid.regions.id;
 
-create sequence covid.cvd_updates_seq start 1 increment by 1;
+create sequence covid.cvd_updates_seq start 1 increment by 1 no minvalue no maxvalue cache 1;
 
 create table covid.cvd_updates
 (
@@ -25,11 +25,11 @@ create table covid.cvd_updates
     datetime timestamp
 );
 
-alter sequence covid.cvd_updates_seq owned by covid.cvd_updates.id;
-alter sequence covid.cvd_updates_seq owner to covid19;
 alter table covid.cvd_updates owner to covid19;
+alter sequence covid.cvd_updates_seq owner to covid19;
+alter sequence covid.cvd_updates_seq owned by covid.cvd_updates.id;
 
-create sequence covid.cvd_stats_seq start 1 increment by 1;
+create sequence covid.cvd_stats_seq start 1 increment by 1 no minvalue no maxvalue cache 1;
 
 create table if not exists covid.cvd_stats
 (
@@ -45,7 +45,7 @@ create table if not exists covid.cvd_stats
 		constraint fk_cvd_stats_updates references covid.cvd_updates
 );
 
-alter sequence covid.cvd_stats_seq owned by covid.cvd_stats.id;
+alter table covid.cvd_stats owner to covid19;
 alter sequence covid.cvd_stats_seq owner to covid19;
-alter table covid_statistics owner to covid19;
+alter sequence covid.cvd_stats_seq owned by covid.cvd_stats.id;
 

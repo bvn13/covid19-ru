@@ -14,16 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-package com.bvn13.covid19.model;
+package com.bvn13.covid19.db.migration;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Covid19ModelApplication {
+public class Covid19DbMigratorApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Covid19ModelApplication.class, args);
+        SpringApplication.run(Covid19DbMigratorApplication.class, args);
     }
 
 }

@@ -3,6 +3,11 @@ spring:
   application:
     name: covid19-model
 
+  flyway:
+    locations: classpath:db/migration
+    schemas: covid
+
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/covid19

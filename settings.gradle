@@ -7,5 +7,6 @@
 rootProject.name = 'covid19'
 
 include ':covid19-model'
+include ':covid19-db-migrator'
 include ':covid19-api'
 include ':covid19-scheduler'

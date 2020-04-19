@@ -21,8 +21,7 @@ spring:
     name: covid19-scheduler
 
   flyway:
-    locations: classpath:db/migration
-    schemas: covid
+    enabled: false
 
   datasource:
     driver-class-name: org.postgresql.Driver

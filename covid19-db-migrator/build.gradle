@@ -3,6 +3,8 @@ apply plugin: 'org.springframework.boot'
 version = '0.0.2'
 
 dependencies {
+    compile(project(':covid19-model'))
+
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -14,8 +16,5 @@ dependencies {
 }
 
 springBoot {
-    mainClassName 'com.bvn13.covid19.model.Covid19ModelApplication'
+    mainClassName 'com.bvn13.covid19.db.migration.Covid19DbMigratorApplication'
 }
-
-bootJar { enabled = false }
-jar { enabled = true }
