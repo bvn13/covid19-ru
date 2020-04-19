@@ -101,4 +101,4 @@ from public.covid_statistics as s
          inner join public.update_info as u_old
                     on u_old.id = s.update_info_id
          inner join covid.cvd_updates as u_new
-                    on u_new.datetime = u_old.datetime;
+                    on u_new.created_on = u_old.created_on;
