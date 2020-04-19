@@ -13,5 +13,9 @@ dependencies {
     testImplementation 'com.h2database:h2:1.4.194'
 }
 
+springBoot {
+    mainClassName 'com.bvn13.covid19.model.Covid19ModelApplication'
+}
+
 bootJar { enabled = true }
 jar { enabled = true }
