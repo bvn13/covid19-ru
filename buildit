@@ -1,6 +1,14 @@
+#!/bin/bash
+
+version=0.0.2
+
+./gradlew :covid19-model:clean :covid19-model:assemble
 ./gradlew :covid19-api:clean :covid19-api:assemble
 ./gradlew :covid19-scheduler:clean :covid19-scheduler:assemble
 
-cp covid19-api/build/libs/covid19-api-0.0.1.jar ../covid19-api-0.0.1.jar
-cp covid19-scheduler/build/libs/covid19-scheduler-0.0.1.jar ../covid19-scheduler-0.0.1.jar
+[ ! -d "build" ] && mkdir "build";
+
+cp "covid19-model/build/libs/covid19-model-$version.jar" "build/covid19-model-$version.jar"
+cp "covid19-api/build/libs/covid19-api-$version.jar" "build/covid19-api-$version.jar"
+cp "covid19-scheduler/build/libs/covid19-scheduler-$version.jar" "build/covid19-scheduler-$version.jar"
 

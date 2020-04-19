@@ -1,6 +1,6 @@
 apply plugin: 'org.springframework.boot'
 
-version = '0.0.1'
+version = '0.0.2'
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
@@ -13,5 +13,5 @@ dependencies {
     testImplementation 'com.h2database:h2:1.4.194'
 }
 
-bootJar { enabled = false }
+bootJar { enabled = true }
 jar { enabled = true }
