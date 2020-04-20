@@ -19,6 +19,7 @@ package com.bvn13.covid19.site.service;
 import com.bvn13.covid19.model.entities.CovidStat;
 import com.bvn13.covid19.model.entities.CovidUpdate;
 import com.bvn13.covid19.model.entities.Region;
+import com.bvn13.covid19.site.dtos.CovidUpdateInfoDto;
 import com.bvn13.covid19.site.repositories.CovidStatsRepository;
 import com.bvn13.covid19.site.repositories.CovidUpdatesRepository;
 import com.bvn13.covid19.site.repositories.RegionsRepository;
@@ -92,15 +93,12 @@ public class StatisticsPreparator {
         if (date.isBefore(projectStartZonedDate)) {
             return Optional.empty();
         } else {
-            Optional<CovidUpdate> update = updatesRepository.findByDateOfUpdate(
+            Optional<CovidUpdateInfoDto> update = updatesRepository.findByDateOfUpdate(
                     dateWithTime(prevDate(date), 0, 0, 0),
                     dateWithTime(date, 0, 0, 0)
             );
-            if (update.isPresent()) {
-                return update;
-            } else {
-                return findPrevUpdateByDate(prevDate(date));
-            }
+            return update.map(upd -> updatesRepository.findFirstByCreatedOn(update.get().getCreatedOn()))
+                    .orElse(findPrevUpdateByDate(prevDate(date)));
         }
     }
 

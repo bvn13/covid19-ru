@@ -32,13 +32,19 @@ import java.util.Optional;
 @Repository
 public interface CovidUpdatesRepository extends JpaRepository<CovidUpdate, Long> {
 
-    @Query("select new com.bvn13.covid19.site.dtos.CovidUpdateInfoDto(max(U.createdOn)) from CovidUpdate U")
+    @Query("select new com.bvn13.covid19.site.dtos.CovidUpdateInfoDto(max(U.createdOn))" +
+            " from CovidUpdate U")
     Optional<CovidUpdateInfoDto> findLastUpdate();
 
-    @Query("select U from CovidUpdate U where U.datetime >= :date1 and U.datetime < :date2")
-    Optional<CovidUpdate> findByDateOfUpdate(@Param("date1") ZonedDateTime date1, @Param("date2") ZonedDateTime date2);
+    @Query("select new com.bvn13.covid19.site.dtos.CovidUpdateInfoDto(max(U.createdOn))" +
+            " from CovidUpdate U" +
+            " where U.datetime >= :date1" +
+            " and U.datetime < :date2")
+    Optional<CovidUpdateInfoDto> findByDateOfUpdate(@Param("date1") ZonedDateTime date1, @Param("date2") ZonedDateTime date2);
 
-    @Query("select U from CovidUpdate U where U.id in (select max(U1.id) from CovidUpdate U1 group by U1.datetime)")
+    @Query("select U" +
+            " from CovidUpdate U" +
+            " where U.id in (select max(U1.id) from CovidUpdate U1 group by U1.datetime)")
     Collection<CovidUpdate> findAllLastUpdatesPerDay();
 
     Optional<CovidUpdate> findFirstByCreatedOn(LocalDateTime createdOn);
