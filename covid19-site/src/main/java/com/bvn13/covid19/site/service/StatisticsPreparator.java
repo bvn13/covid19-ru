@@ -23,10 +23,17 @@ import com.bvn13.covid19.site.repositories.CovidStatsRepository;
 import com.bvn13.covid19.site.repositories.CovidUpdatesRepository;
 import com.bvn13.covid19.site.repositories.RegionsRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -35,11 +42,29 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
-public class CovidStatsMaker {
+public class StatisticsPreparator {
 
     private final CovidStatsRepository statsRepository;
     private final CovidUpdatesRepository updatesRepository;
     private final RegionsRepository regionsRepository;
+
+    private LocalDate projectStartDate;
+    private ZonedDateTime projectStartZonedDate;
+    @Value("${app.zone-id}")
+    private String zoneIdStr;
+
+    @PostConstruct
+    public void init() {
+        ZoneId zoneId = ZoneId.of(zoneIdStr);
+        projectStartZonedDate = projectStartDate.atTime(0, 0, 0).atZone(zoneId);
+    }
+
+    @Value("${app.project-start-date}")
+    private void setProjectStartDate(String ld) {
+        if (ld != null && !ld.isEmpty()) {
+            projectStartDate = LocalDate.parse(ld);
+        }
+    }
 
     @Transactional
     public Collection<CovidStat> getLastCovidStats() {
@@ -57,6 +82,26 @@ public class CovidStatsMaker {
     public Optional<CovidUpdate> findLastUpdate() {
         return updatesRepository.findLastUpdate()
                 .flatMap(updateInfo -> updatesRepository.findFirstByCreatedOn(updateInfo.getCreatedOn()));
+    }
+
+    @Cacheable(
+            cacheNames = "covid-prev-update-by-date",
+            unless = "#result == null"
+    )
+    public Optional<CovidUpdate> findPrevUpdateByDate(ZonedDateTime date) {
+        if (date.isBefore(projectStartZonedDate)) {
+            return Optional.empty();
+        } else {
+            Optional<CovidUpdate> update = updatesRepository.findByDateOfUpdate(
+                    dateWithTime(prevDate(date), 0, 0, 0),
+                    dateWithTime(date, 0, 0, 0)
+            );
+            if (update.isPresent()) {
+                return update;
+            } else {
+                return findPrevUpdateByDate(prevDate(date));
+            }
+        }
     }
 
     @Cacheable(
@@ -82,6 +127,17 @@ public class CovidStatsMaker {
     )
     public List<String> findAllRegionsNames() {
         return regionsRepository.findAll().stream().map(Region::getName).collect(Collectors.toList());
+    }
+
+    private ZonedDateTime prevDate(ZonedDateTime date) {
+        return date.minus(1, ChronoUnit.DAYS);
+    }
+
+    private ZonedDateTime dateWithTime(ZonedDateTime date, int hour, int minute, int second) {
+        return date
+                .withHour(hour)
+                .withMinute(minute)
+                .withSecond(second);
     }
 
 }

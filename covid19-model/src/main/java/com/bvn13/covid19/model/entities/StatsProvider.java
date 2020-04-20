@@ -14,29 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-package com.bvn13.covid19.site.model;
+package com.bvn13.covid19.model.entities;
 
-import com.bvn13.covid19.model.entities.StatsProvider;
-import lombok.Builder;
-import lombok.Value;
-
-@Builder(toBuilder = true)
-@Value
-public class CovidData implements StatsProvider {
-
-    String region;
-    long sick;
-    long healed;
-    long died;
-
-    Delta previous;
-
-    @Builder
-    @Value
-    public static class Delta implements StatsProvider {
-        long sick;
-        long healed;
-        long died;
-    }
-
+public interface StatsProvider {
+    long getSick();
+    long getHealed();
+    long getDied();
 }

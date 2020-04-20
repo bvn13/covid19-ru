@@ -1,11 +1,30 @@
+/*
+Copyright [2020] [bvn13]
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+ */
+
 package com.bvn13.covid19.site.controllers;
 
 import com.bvn13.covid19.model.entities.CovidStat;
+import com.bvn13.covid19.model.entities.CovidUpdate;
+import com.bvn13.covid19.model.entities.Region;
+import com.bvn13.covid19.model.entities.StatsProvider;
 import com.bvn13.covid19.site.model.CovidAllStats;
-import com.bvn13.covid19.site.model.CovidData;
 import com.bvn13.covid19.site.model.CovidDayStats;
-import com.bvn13.covid19.site.service.CovidStatsMaker;
-import com.bvn13.covid19.site.service.CovidStatsResponseMaker;
+import com.bvn13.covid19.site.repositories.RegionsRepository;
+import com.bvn13.covid19.site.service.StatisticsPreparator;
+import com.bvn13.covid19.site.service.StatisticsAggregator;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,10 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -27,8 +43,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/stats")
 public class AllStatsController {
 
-    private final CovidStatsMaker covidStatsMaker;
-    private final CovidStatsResponseMaker covidStatsResponseMaker;
+    private final StatisticsPreparator statisticsPreparator;
+    private final StatisticsAggregator statisticsAggregator;
+    private final RegionsRepository regionsRepository;
 
     @Value("${app.zone-id}")
     private String zoneIdStr;
@@ -51,45 +68,53 @@ public class AllStatsController {
     }
 
     private CovidAllStats constructResponseForRegion(String regionName) {
-        return CovidAllStats.builder()
-                .regions(Collections.singletonList(regionName))
-                .progress(covidStatsMaker.findAllLastUpdatesPerDay().stream()
-                        .map(covidUpdate -> CovidDayStats.builder()
-                                .datetime(covidUpdate.getDatetime())
-                                .updatedOn(covidUpdate.getCreatedOn().atZone(zoneId))
-                                .stats(convertStatsToData(findCovidStatsByUpdateIdAndRegion(covidUpdate.getId(), regionName)))
-                                .build())
-                        .sorted(CovidDayStats::compareTo)
-                        .collect(Collectors.toList()))
-                .build();
+        return regionsRepository.findFirstByName(regionName)
+                .map(region -> CovidAllStats.builder()
+                        .regions(Collections.singletonList(region.getName()))
+                        .progress(compoundProgressForRegions(Collections.singletonList(region)))
+                        .build()
+                )
+                .orElse(CovidAllStats.builder()
+                        .regions(Collections.singletonList(regionName))
+                        .progress(Collections.emptyList())
+                        .build()
+                );
     }
 
     private CovidAllStats constructResponseForAllRegions() {
         return CovidAllStats.builder()
-                .regions(covidStatsMaker.findAllRegionsNames())
-                .progress(covidStatsMaker.findAllLastUpdatesPerDay().stream()
-                        .map(covidUpdate -> CovidDayStats.builder()
-                                .datetime(covidUpdate.getDatetime())
-                                .updatedOn(covidUpdate.getCreatedOn().atZone(zoneId))
-                                .stats(convertStatsToData(findCovidStatsByUpdateId(covidUpdate.getId())))
-                                .build())
-                        .sorted(CovidDayStats::compareTo)
-                        .collect(Collectors.toList()))
+                .regions(statisticsPreparator.findAllRegionsNames())
+                .progress(compoundProgressForRegions(regionsRepository.findAll()))
                 .build();
     }
 
-    private List<CovidData> convertStatsToData(Collection<CovidStat> stats) {
-        return covidStatsResponseMaker.convertStats(stats);
-    }
-
-    private List<CovidStat> findCovidStatsByUpdateIdAndRegion(long updateId, String region) {
-        return covidStatsMaker.findCovidStatsByUpdateInfoId(updateId).stream()
-                .filter(covidStat -> region.equals(covidStat.getRegion().getName()))
+    private List<CovidDayStats> compoundProgressForRegions(List<Region> regions) {
+        return statisticsPreparator.findAllLastUpdatesPerDay().stream()
+                .map(covidUpdate -> prepareDayStats(covidUpdate, regions))
+                .sorted(CovidDayStats::compareTo)
                 .collect(Collectors.toList());
     }
 
-    private List<CovidStat> findCovidStatsByUpdateId(long updateId) {
-        return new ArrayList<>(covidStatsMaker.findCovidStatsByUpdateInfoId(updateId));
+    private CovidDayStats prepareDayStats(CovidUpdate currentUpdate, List<Region> regions) {
+        List<CovidStat> currentStats = findCovidStatsByUpdateIdAndRegion(currentUpdate.getId(), regions);
+        Optional<CovidUpdate> prevUpdate = statisticsPreparator.findPrevUpdateByDate(currentUpdate.getDatetime());
+        Map<Region, StatsProvider> prevStats = prevUpdate
+                .map(covidUpdate -> statisticsPreparator.findCovidStatsByUpdateInfoId(covidUpdate.getId()).stream()
+                        .collect(Collectors.toMap(CovidStat::getRegion, (cs) -> (StatsProvider) cs))
+                )
+                .orElseGet(() -> new HashMap<>(0));
+
+        return CovidDayStats.builder()
+                .datetime(currentUpdate.getDatetime())
+                .updatedOn(currentUpdate.getCreatedOn().atZone(zoneId))
+                .stats(statisticsAggregator.prepareStats(currentStats, prevStats))
+                .build();
+    }
+
+    private List<CovidStat> findCovidStatsByUpdateIdAndRegion(long updateId, List<Region> regions) {
+        return statisticsPreparator.findCovidStatsByUpdateInfoId(updateId).stream()
+                .filter(covidStat -> regions.contains(covidStat.getRegion()))
+                .collect(Collectors.toList());
     }
 
 }

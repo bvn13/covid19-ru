@@ -20,9 +20,12 @@ import com.bvn13.covid19.site.dtos.CovidUpdateInfoDto;
 import com.bvn13.covid19.model.entities.CovidUpdate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -31,6 +34,9 @@ public interface CovidUpdatesRepository extends JpaRepository<CovidUpdate, Long>
 
     @Query("select new com.bvn13.covid19.site.dtos.CovidUpdateInfoDto(max(U.createdOn)) from CovidUpdate U")
     Optional<CovidUpdateInfoDto> findLastUpdate();
+
+    @Query("select U from CovidUpdate U where U.datetime >= :date1 and U.datetime < :date2")
+    Optional<CovidUpdate> findByDateOfUpdate(@Param("date1") ZonedDateTime date1, @Param("date2") ZonedDateTime date2);
 
     @Query("select U from CovidUpdate U where U.id in (select max(U1.id) from CovidUpdate U1 group by U1.datetime)")
     Collection<CovidUpdate> findAllLastUpdatesPerDay();

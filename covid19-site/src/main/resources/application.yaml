@@ -4,6 +4,7 @@ server:
 app:
   zone-id: Europe/Moscow
   main-url: http://localhost:8080
+  project-start-date: 2020-03-01
 
 spring:
   application:
@@ -13,7 +14,7 @@ spring:
     type: caffeine
     caffeine:
       spec: expireAfterWrite=15m
-    cache-names: covid-last-update, covid-all-days-updates, covid-stats-by-update-info-id, covid-regions
+    cache-names: covid-last-update, covid-all-days-updates, covid-stats-by-update-info-id, covid-regions, covid-prev-update-by-date
 
   flyway:
     enabled: false

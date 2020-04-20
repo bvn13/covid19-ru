@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(schema = "covid", name = "cvd_stats")
-public class CovidStat {
+public class CovidStat implements StatsProvider {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "cvd_stats_seq")

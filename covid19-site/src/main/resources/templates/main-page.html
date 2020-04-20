@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>Home page</title>
+    <title>Статистика COVID19 в России</title>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
@@ -27,6 +27,13 @@
 <div style="width: 75%;">
     <canvas id="chart"></canvas>
 </div>
+
+<p>
+    <a href="https://github.com/bvn13/covid19-ru">Исходный код</a>
+</p>
+<p>
+    <a href="https://twitter.com/bvn13">@bvn13 - Автор проекта</a>
+</p>
 
 <script th:inline="javascript">
     var mainUrl = [[${@mainConfig.getMainUrl()}]];
@@ -68,33 +75,72 @@
             function showData(json) {
                 var labels = _.map(json.progress, (progress) => progress.datetime.substr(0, 10));
                 var sick = _.map(json.progress, (progress) => progress.stats.length > 0 ? progress.stats[0].sick : 0);
+                var sickDeltas = _.map(json.progress, (progress) =>
+                    progress.stats.length > 0
+                        ? progress.stats[0].sick - progress.stats[0].previous.sick
+                        : 0
+                );
                 var healed = _.map(json.progress, (progress) => progress.stats.length > 0 ? progress.stats[0].healed : 0);
+                var healedDeltas = _.map(json.progress, (progress) =>
+                    progress.stats.length > 0
+                        ? progress.stats[0].healed - progress.stats[0].previous.healed
+                        : 0
+                );
                 var died = _.map(json.progress, (progress) => progress.stats.length > 0 ? progress.stats[0].died : 0);
+                var diedDeltas = _.map(json.progress, (progress) =>
+                    progress.stats.length > 0
+                        ? progress.stats[0].died - progress.stats[0].previous.died
+                        : 0
+                );
 
                 var myChart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Всего',
+                            label: 'Всего (чел.)',
                             data: sick,
                             backgroundColor: 'red',
                             borderColor: 'red',
                             borderWidth: 1,
                             fill: false
                         }, {
-                            label: 'Выздоровело',
+                            label: 'Выздоровело (чел.)',
                             data: healed,
                             backgroundColor: 'green',
                             borderColor: 'green',
                             borderWidth: 1,
                             fill: false
                         }, {
-                            label: 'Умерло',
+                            label: 'Умерло (чел.)',
                             data: died,
                             backgroundColor: 'black',
                             borderColor: 'black',
                             borderWidth: 1,
+                            fill: false
+                        }, {
+                            label: 'Всего (дельта чел.)',
+                            data: sickDeltas,
+                            backgroundColor: 'red',
+                            borderColor: 'red',
+                            borderWidth: 1,
+                            borderDash: [5, 15],
+                            fill: false
+                        }, {
+                            label: 'Выздоровело (дельта чел.)',
+                            data: healedDeltas,
+                            backgroundColor: 'green',
+                            borderColor: 'green',
+                            borderWidth: 1,
+                            borderDash: [5, 15],
+                            fill: false
+                        }, {
+                            label: 'Умерло (дельта чел.)',
+                            data: diedDeltas,
+                            backgroundColor: 'black',
+                            borderColor: 'black',
+                            borderWidth: 1,
+                            borderDash: [5, 15],
                             fill: false
                         }]
                     },
