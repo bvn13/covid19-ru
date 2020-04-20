@@ -1,6 +1,6 @@
 apply plugin: 'org.springframework.boot'
 
-version = '0.0.2'
+version = '0.0.3'
 
 dependencies {
     compile(project(':covid19-model'))
@@ -17,5 +17,5 @@ dependencies {
 }
 
 springBoot {
-    mainClassName 'com.bvn13.covid19.api.Covid19ApiApplication'
+    mainClassName 'com.bvn13.covid19.site.Covid19SiteApplication'
 }
