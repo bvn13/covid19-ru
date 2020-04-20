@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version=0.0.3
+version=0.1.0
 
 ./gradlew :covid19-db-migrator:clean :covid19-db-migrator:assemble
 ./gradlew :covid19-site:clean :covid19-site:assemble

@@ -1,7 +1,5 @@
 apply plugin: 'org.springframework.boot'
 
-version = '0.0.3'
-
 dependencies {
     compile(project(':covid19-model'))
 
