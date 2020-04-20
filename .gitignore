@@ -6,3 +6,5 @@ dataSources
 *.iws
 
 .gradle/
+
+upload
