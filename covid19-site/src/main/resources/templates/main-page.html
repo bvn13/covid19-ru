@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Home page</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <!--    <link rel="stylesheet" th:href="@{/css/chart.min.css}">-->
+</head>
+<body>
+<p>
+    <span th:text="'Today is: ' + ${#dates.format(#dates.createNow(), 'dd MMM yyyy HH:mm')}" th:remove="tag"></span>
+</p>
+<p>
+    <a th:href="${@mainConfig.getMainUrl()} + '/stats/last'">Последние данные</a>
+</p>
+<p>
+    <a th:href="${@mainConfig.getMainUrl()} + '/stats/all'">Все данные</a>
+</p>
+
+<p>
+    <label for="region">Регион</label>
+    <select id="region"></select>
+</p>
+
+<div style="width: 75%;">
+    <canvas id="chart"></canvas>
+</div>
+
+<script th:inline="javascript">
+    var mainUrl = [[${@mainConfig.getMainUrl()}]];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        (function ($) {
+            function setUpRegions(regions) {
+                $("#region > option").each((i, el) => {
+                    $(el).remove();
+                });
+
+                _.forEach(regions, (region) => {
+                    $("#region").append("<option value='" + region + "'>" + region + "</option>");
+                });
+
+                onRegionChanged();
+            }
+
+            function getRegion() {
+                return document.getElementById("region").value;
+            }
+
+            function onRegionChanged() {
+                var region = getRegion();
+                loadStatsForRegion(region);
+            }
+
+            function loadStatsForRegion(region) {
+                fetch(mainUrl + '/stats/all?region=' + region)
+                    .then(value => {
+                        return value.json()
+                    })
+                    .then(json => {
+                        console.log(json);
+                        showData(json);
+                    });
+            }
+
+            function showData(json) {
+                var labels = _.map(json.progress, (progress) => progress.datetime.substr(0, 10));
+                var sick = _.map(json.progress, (progress) => progress.stats.length > 0 ? progress.stats[0].sick : 0);
+                var healed = _.map(json.progress, (progress) => progress.stats.length > 0 ? progress.stats[0].healed : 0);
+                var died = _.map(json.progress, (progress) => progress.stats.length > 0 ? progress.stats[0].died : 0);
+
+                var myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Всего',
+                            data: sick,
+                            backgroundColor: 'red',
+                            borderColor: 'red',
+                            borderWidth: 1,
+                            fill: false
+                        }, {
+                            label: 'Выздоровело',
+                            data: healed,
+                            backgroundColor: 'green',
+                            borderColor: 'green',
+                            borderWidth: 1,
+                            fill: false
+                        }, {
+                            label: 'Умерло',
+                            data: died,
+                            backgroundColor: 'black',
+                            borderColor: 'black',
+                            borderWidth: 1,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        elements: {
+                            line: {
+                                tension: 0.000001
+                            }
+                        },
+                        scales: {
+                            xAxes: [{
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Дата'
+                                }
+                            }],
+                            yAxes: [{
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Количество (чел.)'
+                                },
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+
+                myChart.canvas.parentNode.style.width = '1024px';
+                // myChart.canvas.parentNode.style.height = '1024px';
+            }
+
+            $("#region").change(() => onRegionChanged());
+
+            var ctx = document.getElementById('chart').getContext('2d');
+
+            fetch(mainUrl + '/regions')
+                .then(value => {
+                    return value.json()
+                })
+                .then(json => setUpRegions(json));
+
+        })(jQuery);
+
+    });
+
+</script>
+
+<script th:src="@{/js/jquery-3.5.0.min.js}"></script>
+<script th:src="@{/js/polyfill.min.js}"></script>
+<script th:src="@{/js/fetch.min.js}"></script>
+<script th:src="@{/js/chart.min.js}"></script>
+<script th:src="@{/js/lodash.js}"></script>
+
+</body>
+
+</html>

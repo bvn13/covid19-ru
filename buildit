@@ -3,12 +3,11 @@
 version=0.0.2
 
 ./gradlew :covid19-db-migrator:clean :covid19-db-migrator:assemble
-./gradlew :covid19-api:clean :covid19-api:assemble
+./gradlew :covid19-site:clean :covid19-site:assemble
 ./gradlew :covid19-scheduler:clean :covid19-scheduler:assemble
 
 [ ! -d "build" ] && mkdir "build";
 
 cp "covid19-db-migrator/build/libs/covid19-db-migrator-$version.jar" "build/covid19-db-migrator-$version.jar"
-cp "covid19-api/build/libs/covid19-api-$version.jar" "build/covid19-api-$version.jar"
+cp "covid19-site/build/libs/covid19-site-$version.jar" "build/covid19-site-$version.jar"
 cp "covid19-scheduler/build/libs/covid19-scheduler-$version.jar" "build/covid19-scheduler-$version.jar"
-

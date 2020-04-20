@@ -1,0 +1,58 @@
+server:
+  port: 8080
+
+app:
+  zone-id: Europe/Moscow
+  main-url: http://localhost:8080
+
+spring:
+  application:
+    name: covid19-api
+
+  cache:
+    type: caffeine
+    caffeine:
+      spec: expireAfterWrite=15m
+    cache-names: covid-last-update, covid-all-days-updates, covid-stats-by-update-info-id, covid-regions
+
+  flyway:
+    enabled: false
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/covid19
+    username: <covid19>
+    password: <covid19pass>
+
+  jpa:
+    show-sql: true
+    hibernate:
+      dialect: org.hibernate.dialect.PostgreSQL
+      ddl-auto: validate
+
+    properties:
+      hibernate:
+        default_schema: covid
+        use_sql_comments: true
+        format_sql: true
+        show_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+logging:
+  level:
+    root: info
+    com:
+      bvn13:
+        covid19: debug
+    org:
+      springframework: warn
+      hibernate:
+        SQL: debug
+        type:
+          descriptor:
+            sql:
+              BasicBinder: trace
+  pattern:
+    console: "%d{dd-MM-yyyy HH:mm:ss.SSS} %highlight(%-5level) %magenta([%thread]) %yellow(%logger.%M) - %msg%n"
+
