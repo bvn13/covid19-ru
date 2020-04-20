@@ -40,7 +40,7 @@ public class AllStatsController {
     }
 
     @GetMapping("/all")
-    public CovidAllStats getStatistics(@RequestParam("region") String regionName) {
+    public CovidAllStats getStatistics(@RequestParam(value = "region", required = false) String regionName) {
 
         if (StringUtils.isNotBlank(regionName)) {
             return constructResponseForRegion(regionName);
