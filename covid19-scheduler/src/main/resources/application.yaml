@@ -13,8 +13,10 @@ app:
     password: <mail-password>
     host: smtp.yandex.ru
     port: 465
-    to: <your-password>
+    sender: <your-sender>
+    recipient: <your-recipient>
     subject: Ошибка загрузки данных COVID19
+    debugMode: false
 
 spring:
   application:
