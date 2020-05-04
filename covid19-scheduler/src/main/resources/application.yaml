@@ -44,6 +44,11 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+
+webdriver:
+  gecko:
+    driver: /home/bvn13/soft/geckodriver
+
 logging:
   level:
     root: info

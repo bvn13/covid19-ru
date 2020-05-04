@@ -23,6 +23,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.util.Assert;
+
+import java.io.File;
+import java.nio.file.Files;
 
 @EnableJpaRepositories("com.bvn13.covid19.scheduler")
 @SpringBootApplication
@@ -33,6 +37,17 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 public class Covid19SchedulerApplication {
 
     public static void main(String[] args) {
+
+        String geckoFilename = ResourceManager.extract("/files/geckodriver");
+        Assert.notNull(geckoFilename, "geckodriver not found inside JAR");
+
+        File file = new File(geckoFilename);
+        if (!file.canExecute()) {
+            Assert.isTrue(file.setExecutable(true, true), "Could not make executable: "+geckoFilename);
+        }
+
+        System.setProperty("webdriver.gecko.driver", geckoFilename);
+
         SpringApplication.run(Covid19SchedulerApplication.class, args);
     }
 
