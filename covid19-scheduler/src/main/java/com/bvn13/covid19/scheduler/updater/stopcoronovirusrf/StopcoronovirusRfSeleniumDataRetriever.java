@@ -71,10 +71,10 @@ public class StopcoronovirusRfSeleniumDataRetriever implements StopcoronovirusRf
 
             for (WebElement row : tableData) {
                 RowData rowData = RowData.builder()
-                        .region(row.findElement(By.cssSelector("th")).getAttribute("innerText"))
-                        .sick(row.findElement(By.cssSelector("td.col-sick")).getAttribute("innerText"))
-                        .healed(row.findElement(By.cssSelector("td.col-healed")).getAttribute("innerText"))
-                        .died(row.findElement(By.cssSelector("td.col-died")).getAttribute("innerText"))
+                        .region(row.findElement(By.cssSelector("th")).getAttribute("innerText").trim())
+                        .sick(row.findElement(By.cssSelector("td.col-sick")).getAttribute("innerText").trim())
+                        .healed(row.findElement(By.cssSelector("td.col-healed")).getAttribute("innerText").trim())
+                        .died(row.findElement(By.cssSelector("td.col-died")).getAttribute("innerText").trim())
                         .build();
                 Assert.isTrue(StringUtils.isNotBlank(rowData.getRegion()), "Broken data found after " + rows.size() + " rows");
                 rows.add(rowData);
