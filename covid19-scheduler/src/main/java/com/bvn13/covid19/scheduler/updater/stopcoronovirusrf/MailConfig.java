@@ -31,7 +31,7 @@ import javax.annotation.PostConstruct;
 public class MailConfig {
 
     private String username;
-    private String passwd;
+    private String password;
     private String host;
     private int port;
     private String sender;
@@ -43,7 +43,7 @@ public class MailConfig {
     public void init() {
         if (StringUtils.isBlank(host) ||
                 StringUtils.isBlank(username) ||
-                StringUtils.isBlank(passwd) ||
+                StringUtils.isBlank(password) ||
                 StringUtils.isBlank(sender) ||
                 StringUtils.isBlank(recipient) ||
                 StringUtils.isBlank(subject) ||
@@ -57,7 +57,7 @@ public class MailConfig {
     public String constructEndpoint() {
         return "smtps://" + host + ":" + port +
                 "?username=" + username +
-                "&password=" + passwd +
+                "&password=" + password +
                 "&from=" + sender +
                 "&to=" + recipient +
                 "&subject=" + subject +
