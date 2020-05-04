@@ -18,14 +18,11 @@ package com.bvn13.covid19.scheduler.updater.stopcoronovirusrf;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import javax.annotation.PostConstruct;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 
 @NoArgsConstructor
 @Data
@@ -34,7 +31,7 @@ import javax.validation.constraints.Min;
 public class MailConfig {
 
     private String username;
-    private String password;
+    private String passwd;
     private String host;
     private int port;
     private String sender;
@@ -46,7 +43,7 @@ public class MailConfig {
     public void init() {
         if (StringUtils.isBlank(host) ||
                 StringUtils.isBlank(username) ||
-                StringUtils.isBlank(password) ||
+                StringUtils.isBlank(passwd) ||
                 StringUtils.isBlank(sender) ||
                 StringUtils.isBlank(recipient) ||
                 StringUtils.isBlank(subject) ||
@@ -60,7 +57,7 @@ public class MailConfig {
     public String constructEndpoint() {
         return "smtps://" + host + ":" + port +
                 "?username=" + username +
-                "&password=" + password +
+                "&password=" + passwd +
                 "&from=" + sender +
                 "&to=" + recipient +
                 "&subject=" + subject +
