@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.bvn13.covid19.scheduler.updater.stopcoronovirusrf;
 
+import com.bvn13.covid19.scheduler.updater.UpdaterException;
 import com.bvn13.covid19.scheduler.updater.stopcoronovirusrf.model.RowData;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
@@ -57,7 +58,7 @@ public class StopcoronovirusRfSeleniumDataRetriever implements StopcoronovirusRf
             List<WebElement> tableData = driver.findElements(By.cssSelector(".d-map__list > table > tbody > tr"));
 
             if (tableData.size() <= 0) {
-                throw new IllegalStateException("Data not found!");
+                throw new UpdaterException("Data not found!", driver.getPageSource());
             }
 
             WebElement lastRow = driver.findElement(By.cssSelector(".d-map__list > table > tbody > tr:last-child"));
@@ -65,7 +66,6 @@ public class StopcoronovirusRfSeleniumDataRetriever implements StopcoronovirusRf
             JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("window.scrollBy(0,10000)");
             js.executeScript("arguments[0].scrollIntoView()",lastRow);
-//            js.executeScript("$(\".d-map__list > table > tbody\").animate({ scrollTop: \"10000px\" });");
 
             List<RowData> rows = new ArrayList<>(tableData.size());
 
@@ -77,6 +77,11 @@ public class StopcoronovirusRfSeleniumDataRetriever implements StopcoronovirusRf
                         .died(row.findElement(By.cssSelector("td.col-died")).getAttribute("innerText"))
                         .build();
                 Assert.isTrue(StringUtils.isNotBlank(rowData.getRegion()), "Broken data found after " + rows.size() + " rows");
+                rows.add(rowData);
+            }
+
+            if (rows.size() == 0) {
+                throw new UpdaterException("No data found!", driver.findElement(By.cssSelector(".d-map__list > table > tbody")).getAttribute("outerHTML"));
             }
 
             exchange.getIn().setHeader(StopcoronovirusRfUpdater.HEADER_DATE_OF_DATA, driver.findElement(By.cssSelector(".cv-section__title small")).getText());

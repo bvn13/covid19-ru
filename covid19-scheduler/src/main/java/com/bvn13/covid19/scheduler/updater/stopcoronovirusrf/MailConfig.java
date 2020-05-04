@@ -48,13 +48,13 @@ public class MailConfig {
                 StringUtils.isBlank(recipient) ||
                 StringUtils.isBlank(subject) ||
                 port <= 0 || port > 65536) {
-            throw new IllegalArgumentException("Mail endpoint has no arguments: " + constructEndpoint());
+            throw new IllegalArgumentException("Mail endpoint has no arguments: " + exceptionsEndpoint());
         }
 
-        log.info("MAIL ENDPOINT: " + constructEndpoint());
+        log.info("MAIL ENDPOINT: " + exceptionsEndpoint());
     }
 
-    public String constructEndpoint() {
+    public String exceptionsEndpoint() {
         return "smtps://" + host + ":" + port +
                 "?username=" + username +
                 "&password=" + password +
@@ -62,6 +62,16 @@ public class MailConfig {
                 "&to=" + recipient +
                 "&subject=" + subject +
                 "&debugMode=" + (debugMode ? "true" : "false");
+    }
+
+    public String reportEndpoint() {
+        return "smtps://" + host + ":" + port +
+                "?username=" + username +
+                "&password=" + password +
+                "&from=" + sender +
+                "&to=" + recipient +
+                "&subject=Test COVID19" +
+                "&debugMode=true";
     }
 
 }

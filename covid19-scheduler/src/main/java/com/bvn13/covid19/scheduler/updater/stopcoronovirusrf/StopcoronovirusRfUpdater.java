@@ -16,13 +16,11 @@ limitations under the License.
 
 package com.bvn13.covid19.scheduler.updater.stopcoronovirusrf;
 
+import com.bvn13.covid19.scheduler.updater.UpdaterException;
 import com.bvn13.covid19.scheduler.updater.stopcoronovirusrf.model.RowData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.camel.Body;
-import org.apache.camel.Handler;
-import org.apache.camel.Header;
-import org.apache.camel.LoggingLevel;
+import org.apache.camel.*;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -54,7 +52,14 @@ public class StopcoronovirusRfUpdater extends RouteBuilder {
     public void configure() throws Exception {
 
         onException(RuntimeException.class)
-                .to(mailConfig.constructEndpoint());
+                .to(mailConfig.exceptionsEndpoint());
+
+        onException(UpdaterException.class)
+                .process((exchange) -> {
+                    String body = exchange.getIn().getBody(UpdaterException.class).getBody();
+                    exchange.getIn().setBody(body);
+                })
+                .to(mailConfig.exceptionsEndpoint());
 
         from("timer:stopcoronovirusrf?delay=1000&period="+stopcoronovirusrfTimerMillis)
                 .log(LoggingLevel.DEBUG, log, "Start retrieving data from stopcoronovirus.rf")
@@ -63,11 +68,22 @@ public class StopcoronovirusRfUpdater extends RouteBuilder {
                 .log(LoggingLevel.DEBUG, log, "Processed data count: ${body.size}")
         ;
 
+        from("timer:test?delay=1000&period=0")
+                .log(LoggingLevel.DEBUG, log, "Start sending test email")
+                .process(this::constructTestEmail)
+                .to(mailConfig.reportEndpoint())
+                .log(LoggingLevel.DEBUG, log, "End sending test email");
+
     }
 
     @Handler
     public void saveData(@Header(HEADER_DATE_OF_DATA) String dataDate, @Body Collection<RowData> rawData) {
         service.saveRawData(dataDate, rawData);
+    }
+
+    @Handler
+    public void constructTestEmail(Exchange exchange) {
+        exchange.getIn().setBody("TEST MAIL");
     }
 
 }
